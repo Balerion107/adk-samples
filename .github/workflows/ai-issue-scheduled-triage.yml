@@ -1,24 +1,17 @@
 name: '✨ AI Scheduled Issue Triage'
 
-# Hourly sweep that hands untriaged open issues to
-# `_ai-issue-triage-core.yml` — a safety net for anything the on-open
-# automated-triage workflow missed (an issue opened during CI downtime, a
-# failed run, a label stripped later).
+# Fork note: automatic hourly triage is disabled in this fork because the
+# upstream workflow expects fork-specific GitHub App credentials and provider
+# configuration. Manual dispatch remains available for deliberate testing.
 #
-# Everything about how the triage is performed lives in that core; this
-# workflow only decides WHICH issues to triage.
+# Everything about how the triage is performed lives in `_ai-issue-triage-core.yml`;
+# this workflow only decides WHICH issues to triage.
 
 on:
-  schedule:
-    - cron: '0 * * * *' # Runs every hour
   workflow_dispatch:
 
 concurrency:
   group: '${{ github.workflow }}'
-  # Deliberately false. This is a periodic sweep, not a per-issue reaction:
-  # a newer tick does not obsolete an older one. With `true`, an overrunning
-  # sweep (or a manual dispatch landing near the hour) was killed by the next
-  # cron tick, potentially after labelling only part of its batch.
   cancel-in-progress: false
 
 defaults:
@@ -33,9 +26,9 @@ permissions: {}
 
 jobs:
   # Split from the triage job so the "is there anything to do?" check is
-  # expressed ONCE, as that job's `if`. It also keeps this workflow cheap:
-  # an ordinary hourly run with nothing to triage makes one API call and
-  # stops — no auth, no agy install, no model call.
+  # expressed ONCE, as that job's `if`. It also keeps manual runs cheap:
+  # when nothing needs triage this makes one API call and stops — no auth,
+  # no agy install, no model call.
   find:
     timeout-minutes: 5
     runs-on: 'ubuntu-latest'
@@ -58,17 +51,15 @@ jobs:
           set -euo pipefail
 
           # Every issue is inlined into the prompt WITH ITS BODY, so an
-          # unbounded batch produces an enormous prompt and invites the 429s
-          # we have already seen from the model provider. The hourly cadence
-          # drains any remainder, and a small batch also limits how much is
-          # lost when one run fails partway.
+          # unbounded batch produces an enormous prompt and invites provider
+          # rate limits. A small batch also limits how much is lost when one
+          # run fails partway.
           MAX_BATCH=15
           MAX_BODY_CHARS=4000
 
           # Give the on-open workflow first refusal. Without a floor, an
-          # issue opened moments before the hour is still unlabelled when
-          # this sweep queries, so both workflows triage it at once and can
-          # land two different labels on it.
+          # issue opened moments before this run may still be unlabelled, so
+          # both workflows could triage it at once and land different labels.
           CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
 
           echo "🔍 Finding issues untriaged as of ${CUTOFF}..."
@@ -79,8 +70,7 @@ jobs:
           # label", copying the taxonomy the original prompt assumed. This
           # repository has no such labels — its scheme is flat (`bug`,
           # `enhancement`, `python`, ...) — so that definition matched every
-          # open issue, and the sweep would have re-triaged all of them every
-          # hour forever, never converging.
+          # open issue and would never converge.
           #
           # Trade-off, accepted deliberately: an issue carrying only an
           # incidental label (`good first issue`, `duplicate`) counts as
@@ -105,7 +95,7 @@ jobs:
           echo "issues_to_triage=${ISSUES}" >> "${GITHUB_OUTPUT}"
 
           if [[ "${TOTAL}" -gt "${COUNT}" ]]; then
-            echo "::notice::${TOTAL} issues need triage; taking ${COUNT} this run, the rest follow next hour."
+            echo "::notice::${TOTAL} issues need triage; taking ${COUNT} this run."
           fi
           echo "✅ Triaging ${COUNT} of ${TOTAL} issues. 🎯"
 
