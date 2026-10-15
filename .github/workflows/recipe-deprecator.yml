@@ -14,9 +14,6 @@ name: Recipe Deprecator
 #   3. Assigns new or reopened PRs to repo_admin for manual review.
 
 on:
-  schedule:
-    # Run twice monthly on the 2nd and 16th at 06:00 UTC.
-    - cron: "0 6 2,16 * *"
   workflow_dispatch:
     inputs:
       dry_run:

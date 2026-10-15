@@ -44,14 +44,6 @@ name: Stale Branch Sweep
 #     -f ref="refs/heads/<name>" -f sha="<sha>"
 
 on:
-  schedule:
-    # Mondays 06:00 UTC, an hour after stale-sweep.yml. Ordering matters
-    # because an OPEN pull request is what protects its head and base
-    # branches from this sweep: running afterwards means a PR that workflow
-    # has just closed is already recorded as closed, so its branch starts
-    # the 30-day closed-PR clock this week instead of looking protected for
-    # another seven days.
-    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       dry_run:

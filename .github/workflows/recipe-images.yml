@@ -56,11 +56,6 @@ on:
       - "plugins/**"
       - ".github/workflows/recipe-images.yml"
       - ".github/scripts/recipe_images_matrix.py"
-  schedule:
-    # Weekly, Tuesday 04:23 UTC. Off the hour and off Monday: scheduled runs
-    # are best-effort and GitHub sheds them under scheduler load, and the
-    # contended slots are the top of the hour and the start of the week.
-    - cron: "23 4 * * 2"
   workflow_dispatch:
     inputs:
       recipe:

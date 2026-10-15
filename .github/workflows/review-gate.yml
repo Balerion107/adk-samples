@@ -33,8 +33,6 @@ name: Review Gate
 on: # zizmor: ignore[dangerous-triggers]
   pull_request_target:
     types: [review_requested, ready_for_review]
-  schedule:
-    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       pr:
