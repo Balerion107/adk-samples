@@ -65,15 +65,6 @@ name: Stale Sweep
 # this job needs no `contents: write` scope at all.
 
 on:
-  schedule:
-    # Mondays 05:00 UTC. Ordering within the Monday maintenance window is
-    # deliberate: dependabot-housekeeping.yml at 04:00, this at 05:00, then
-    # stale-branch-sweep.yml at 06:00. An OPEN pull request is what protects
-    # its head and base branch from the branch sweep, so running that sweep
-    # afterwards means it sees a settled view of which pull requests are
-    # open, rather than protecting a branch whose pull request this job is
-    # about to close.
-    - cron: "0 5 * * 1"
   workflow_dispatch:
     inputs:
       dry_run:
