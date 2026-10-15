@@ -32,13 +32,6 @@ name: Dependabot Housekeeping
 # the reported count.
 
 on:
-  schedule:
-    # Mondays at 04:00 UTC, an independent cadence. It used to trail the
-    # 02:00 github-actions run by two hours, but that entry is monthly now
-    # (first of the month) so there is no weekly wave left to follow.
-    # Ordering never mattered: an orphan is by definition an old PR for a
-    # directory that is gone, not something Dependabot opened minutes ago.
-    - cron: "0 4 * * 1"
   workflow_dispatch:
     inputs:
       dry_run:

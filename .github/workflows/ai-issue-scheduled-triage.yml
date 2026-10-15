@@ -9,12 +9,6 @@ name: '✨ AI Scheduled Issue Triage'
 # workflow only decides WHICH issues to triage.
 
 on:
-  schedule:
-    # Every 4 hours. This is a safety net behind the on-open automated
-    # triage, not the primary path, and since the sweep now converges (see
-    # the TRIAGED_LABEL marker below) a steady state finds nothing to do.
-    # Hourly bought no extra responsiveness for 6x the run records.
-    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 concurrency:

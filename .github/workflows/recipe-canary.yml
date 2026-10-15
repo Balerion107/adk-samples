@@ -49,17 +49,6 @@ name: 🐤 Recipe Canary
 #   - go mod verify / go mod tidy -diff for Go (b/565393393)
 
 on:
-  schedule:
-    # Monthly, per the policy decision: the canary reports genuine breakage,
-    # which is rare, and a weekly cadence would spend CI re-confirming the
-    # same green result.
-    #
-    # The 5th at :17 rather than the 1st at :00 on purpose. Scheduled
-    # workflows are best-effort and GitHub drops or delays them under
-    # scheduler load, and the 1st of the month on the hour is the single most
-    # contended slot there is. That matters more than it looks: escalation
-    # advances one rung per run, so a dropped run is a rung not advanced.
-    - cron: "17 6 5 * *"
   workflow_dispatch:
     inputs:
       dry_run:
